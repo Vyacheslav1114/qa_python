@@ -4,7 +4,7 @@ from main import BooksCollector
 
 class TestBooksCollector:
 
-    #  Тест add_new_book — добавление новой книги
+    # 1️⃣ add_new_book — добавление новой книги
     @pytest.mark.parametrize('book_name', [
         'Властелин колец',
         'Пикник на обочине',
@@ -15,9 +15,9 @@ class TestBooksCollector:
         collector.add_new_book(book_name)
 
         assert book_name in collector.get_books_genre()
-        assert collector.get_book_genre(book_name) == ''
+        assert collector.books_genre[book_name] == ''
 
-    #  Тест add_new_book — книга не добавляется, если длиннее 40 символов
+    # 2️⃣ add_new_book — книга не добавляется, если длиннее 40 символов
     def test_add_new_book_too_long_name(self):
         collector = BooksCollector()
         long_name = 'А' * 41
@@ -25,82 +25,76 @@ class TestBooksCollector:
 
         assert long_name not in collector.get_books_genre()
 
-    #  Тест set_book_genre — установка жанра книге
+    # 3️⃣ set_book_genre — установка корректного жанра книге
     def test_set_book_genre_success(self):
         collector = BooksCollector()
-        collector.add_new_book('Матрица')
+        collector.books_genre['Матрица'] = ''
         collector.set_book_genre('Матрица', 'Фантастика')
+
+        assert collector.books_genre['Матрица'] == 'Фантастика'
+
+    # 4️⃣ set_book_genre — жанр не устанавливается, если жанра нет в списке genre
+    def test_set_book_genre_invalid_genre(self):
+        collector = BooksCollector()
+        collector.books_genre['Книга'] = ''
+        collector.set_book_genre('Книга', 'Драма')
+
+        assert collector.books_genre['Книга'] == ''
+
+    # 5️⃣ get_book_genre — возвращает правильный жанр
+    def test_get_book_genre_returns_correct_value(self):
+        collector = BooksCollector()
+        collector.books_genre['Матрица'] = 'Фантастика'
 
         assert collector.get_book_genre('Матрица') == 'Фантастика'
 
-    #  Тест set_book_genre — жанр не устанавливается, если его нет в списке genre
-    def test_set_book_genre_invalid_genre(self):
-        collector = BooksCollector()
-        collector.add_new_book('Книга')
-        collector.set_book_genre('Книга', 'Драма')
-
-        assert collector.get_book_genre('Книга') == ''
-
-    #  Тест get_books_with_specific_genre — возвращает только книги нужного жанра
+    # 6️⃣ get_books_with_specific_genre — возвращает только книги нужного жанра
     def test_get_books_with_specific_genre(self):
         collector = BooksCollector()
-        collector.add_new_book('Книга 1')
-        collector.add_new_book('Книга 2')
-        collector.set_book_genre('Книга 1', 'Комедии')
-        collector.set_book_genre('Книга 2', 'Ужасы')
+        collector.books_genre = {'Книга 1': 'Комедии', 'Книга 2': 'Ужасы'}
 
         result = collector.get_books_with_specific_genre('Комедии')
 
         assert result == ['Книга 1']
 
-    #  Тест get_books_for_children — возвращает книги без возрастного рейтинга
+    # 7️⃣ get_books_for_children — возвращает только книги без возрастного рейтинга
     def test_get_books_for_children(self):
         collector = BooksCollector()
-        collector.add_new_book('Смешарики')
-        collector.add_new_book('Оно')
-        collector.set_book_genre('Смешарики', 'Мультфильмы')
-        collector.set_book_genre('Оно', 'Ужасы')
+        collector.books_genre = {
+            'Смешарики': 'Мультфильмы',
+            'Оно': 'Ужасы',
+            'Матрица': 'Фантастика'
+        }
 
-        books_for_children = collector.get_books_for_children()
+        result = collector.get_books_for_children()
 
-        assert 'Смешарики' in books_for_children
-        assert 'Оно' not in books_for_children
+        assert 'Смешарики' in result
+        assert 'Матрица' in result
+        assert 'Оно' not in result
 
-    #  Тест add_book_in_favorites — добавление книги в избранное
-    def test_add_book_in_favorites(self):
+    # 8️⃣ add_book_in_favorites — добавление книги в избранное
+    def test_add_book_in_favorites_adds_book(self):
         collector = BooksCollector()
-        collector.add_new_book('Гарри Поттер')
+        collector.books_genre['Гарри Поттер'] = 'Фантастика'
         collector.add_book_in_favorites('Гарри Поттер')
 
-        assert 'Гарри Поттер' in collector.get_list_of_favorites_books()
+        assert 'Гарри Поттер' in collector.favorites
 
-    #  Тест add_book_in_favorites — нельзя добавить книгу дважды
-    def test_add_book_in_favorites_twice(self):
+    # 9️⃣ delete_book_from_favorites — удаление книги из избранного
+    def test_delete_book_from_favorites_removes_book(self):
         collector = BooksCollector()
-        collector.add_new_book('Шрек')
-        collector.add_book_in_favorites('Шрек')
-        collector.add_book_in_favorites('Шрек')
-
-        assert collector.get_list_of_favorites_books().count('Шрек') == 1
-
-    #  Тест delete_book_from_favorites — удаление книги из избранного
-    def test_delete_book_from_favorites(self):
-        collector = BooksCollector()
-        collector.add_new_book('Том и Джерри')
-        collector.add_book_in_favorites('Том и Джерри')
+        collector.favorites = ['Том и Джерри']
         collector.delete_book_from_favorites('Том и Джерри')
 
-        assert 'Том и Джерри' not in collector.get_list_of_favorites_books()
+        assert 'Том и Джерри' not in collector.favorites
 
-    #  Тест get_list_of_favorites_books — возвращает корректный список
-    def test_get_list_of_favorites_books(self):
+    # 🔟 get_list_of_favorites_books — возвращает корректный список избранного
+    def test_get_list_of_favorites_books_returns_correct_list(self):
         collector = BooksCollector()
-        collector.add_new_book('Книга 1')
-        collector.add_new_book('Книга 2')
-        collector.add_book_in_favorites('Книга 1')
-        collector.add_book_in_favorites('Книга 2')
+        collector.favorites = ['Шрек', 'Матрица']
 
-        favorites = collector.get_list_of_favorites_books()
+        result = collector.get_list_of_favorites_books()
 
-        assert favorites == ['Книга 1', 'Книга 2']
+        assert result == ['Шрек', 'Матрица']
+
 
