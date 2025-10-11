@@ -57,7 +57,19 @@ class TestBooksCollector:
 
         assert result == ['Книга 1']
 
-    # 7️⃣ get_books_for_children — возвращает только книги без возрастного рейтинга
+    # 7️⃣ get_books_genre — возвращает весь словарь книг и жанров
+    def test_get_books_genre_returns_correct_dict(self):
+        collector = BooksCollector()
+        collector.books_genre = {
+            'Матрица': 'Фантастика',
+            'Оно': 'Ужасы'
+        }
+
+        result = collector.get_books_genre()
+
+        assert result == {'Матрица': 'Фантастика', 'Оно': 'Ужасы'}
+
+    # 8️⃣ get_books_for_children — возвращает только книги без возрастного рейтинга
     def test_get_books_for_children(self):
         collector = BooksCollector()
         collector.books_genre = {
@@ -72,7 +84,7 @@ class TestBooksCollector:
         assert 'Матрица' in result
         assert 'Оно' not in result
 
-    # 8️⃣ add_book_in_favorites — добавление книги в избранное
+    # 9️⃣ add_book_in_favorites — добавление книги в избранное
     def test_add_book_in_favorites_adds_book(self):
         collector = BooksCollector()
         collector.books_genre['Гарри Поттер'] = 'Фантастика'
@@ -80,7 +92,7 @@ class TestBooksCollector:
 
         assert 'Гарри Поттер' in collector.favorites
 
-    # 9️⃣ delete_book_from_favorites — удаление книги из избранного
+    # 🔟 delete_book_from_favorites — удаление книги из избранного
     def test_delete_book_from_favorites_removes_book(self):
         collector = BooksCollector()
         collector.favorites = ['Том и Джерри']
@@ -88,7 +100,7 @@ class TestBooksCollector:
 
         assert 'Том и Джерри' not in collector.favorites
 
-    # 🔟 get_list_of_favorites_books — возвращает корректный список избранного
+    # 1️⃣1️⃣ get_list_of_favorites_books — возвращает корректный список избранного
     def test_get_list_of_favorites_books_returns_correct_list(self):
         collector = BooksCollector()
         collector.favorites = ['Шрек', 'Матрица']
@@ -96,5 +108,3 @@ class TestBooksCollector:
         result = collector.get_list_of_favorites_books()
 
         assert result == ['Шрек', 'Матрица']
-
-
